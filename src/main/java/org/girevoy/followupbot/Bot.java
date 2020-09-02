@@ -15,7 +15,7 @@ public class Bot extends TelegramLongPollingBot {
 
     public Bot() {
         super();
-        this.properties = loadProperties();
+        loadProperties();
     }
 
     @Override
@@ -24,13 +24,10 @@ public class Bot extends TelegramLongPollingBot {
                 update.getMessage().getText());
 
         SendMessage sendMessage = new SendMessage().setChatId(update.getMessage().getChatId());
-//        try {
-//            Thread.sleep(15000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-        sendMessage.setText("Hello " + update.getMessage().getFrom().getFirstName() + "\n" +
-                update.getMessage().getText());
+
+        sendMessage.setText(String.format("Hello %s %s%n%s", update.getMessage().getFrom().getFirstName(),
+                                                             update.getMessage().getFrom().getLastName(),
+                                                             update.getMessage().getText()));
 
         try {
             execute(sendMessage);
@@ -41,32 +38,26 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        properties = loadProperties();
         return properties.getProperty("username");
     }
 
     @Override
     public String getBotToken() {
-        properties = loadProperties();
         return properties.getProperty("token");
     }
 
-    public Properties loadProperties() {
-        Properties prop = new Properties();
+    public void loadProperties() {
+        properties = new Properties();
         try (InputStream input = Bot.class.getClassLoader().getResourceAsStream("telegram.properties")) {
 
             if (input == null) {
                 throw new NoSuchFileException("No such file");
             }
 
-            prop = new Properties();
-
-            prop.load(input);
+            properties.load(input);
 
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
-        return prop;
     }
 }
